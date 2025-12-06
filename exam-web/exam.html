@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Staatsbürgerschaft Quiz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 16px; background: #f5f5f5; }
+    .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 16px 20px 24px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    h1 { font-size: 22px; margin-top: 0; text-align: center; }
+    #question-text { font-size: 18px; margin: 16px 0; }
+    .option { margin: 6px 0; }
+    button { padding: 10px 18px; font-size: 16px; margin-top: 10px; }
+    #progress { font-size: 14px; color: #555; }
+    #result { margin-top: 16px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Staatsbürgerschaft Quiz (Demo)</h1>
+    <div id="progress"></div>
+    <div id="question-text"></div>
+    <div id="options"></div>
+    <button id="next-btn">Weiter</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    // مثال: مزيج من سؤال من النمسا + سؤال من فيينا
+    const questions = [
+      {
+        id: 1,
+        question: "Zu welchem großen Reich gehörte Österreich ab Christi Geburt fast 500 Jahre lang?",
+        correct: ["Zum Römischen Reich"],
+        distractors: ["Zum ägyptischen Reich", "Zum Chinesischen Reich", "Zum Persischen Reich"]
+      },
+      {
+        id: 2,
+        question: "Wo entstand das historische Wien?",
+        correct: ["An einem Kreuzungspunkt alter Verkehrswege südlich der Donau"],
+        distractors: ["Im Norden Kärntens", "Im Salzburger Becken", "Auf einer Insel im Neusiedlersee"]
+      }
+    ];
+
+    let currentIndex = 0;
+    let score = 0;
+    let currentCorrectIndices = new Set();
+
+    const progressEl = document.getElementById("progress");
+    const questionTextEl = document.getElementById("question-text");
+    const optionsEl = document.getElementById("options");
+    const nextBtn = document.getElementById("next-btn");
+    const resultEl = document.getElementById("result");
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function showQuestion() {
+      if (currentIndex >= questions.length) {
+        finishQuiz();
+        return;
+      }
+
+      const q = questions[currentIndex];
+      progressEl.textContent = `Frage ${currentIndex + 1} von ${questions.length}`;
+      questionTextEl.textContent = q.question;
+      optionsEl.innerHTML = "";
+      resultEl.textContent = "";
+
+      const options = shuffle([...q.correct, ...q.distractors]);
+      currentCorrectIndices = new Set();
+      options.forEach((opt, idx) => {
+        if (q.correct.includes(opt)) {
+          currentCorrectIndices.add(idx);
+        }
+      });
+
+      options.forEach((opt, idx) => {
+        const label = document.createElement("label");
+        label.className = "option";
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.value = idx;
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(" " + opt));
+        optionsEl.appendChild(label);
+        optionsEl.appendChild(document.createElement("br"));
+      });
+    }
+
+    function nextQuestion() {
+      const checkboxes = optionsEl.querySelectorAll("input[type='checkbox']");
+      const selected = new Set();
+      checkboxes.forEach((cb, idx) => {
+        if (cb.checked) {
+          selected.add(idx);
+        }
+      });
+
+      // مقارنة مجموعة المؤشرات المحددة مع مجموعة المؤشرات الصحيحة
+      let isCorrect = selected.size === currentCorrectIndices.size;
+      if (isCorrect) {
+        for (let idx of selected) {
+          if (!currentCorrectIndices.has(idx)) {
+            isCorrect = false;
+            break;
+          }
+        }
+      }
+
+      if (isCorrect && currentCorrectIndices.size > 0) {
+        score += 1;
+      }
+
+      currentIndex += 1;
+      if (currentIndex < questions.length) {
+        showQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function finishQuiz() {
+      questionTextEl.textContent = "";
+      optionsEl.innerHTML = "";
+      nextBtn.disabled = true;
+      const percent = (score / questions.length) * 100;
+      const passed = percent >= 50;
+      resultEl.textContent =
+        `Ergebnis: ${score} von ${questions.length} korrekt – ${percent.toFixed(2)}% ` +
+        (passed ? "(BESTANDEN)" : "(NICHT BESTANDEN)");
+    }
+
+    nextBtn.addEventListener("click", nextQuestion);
+
+    // بدء الامتحان عند فتح الصفحة
+    showQuestion();
+  </script>
+</body>
+</html>
