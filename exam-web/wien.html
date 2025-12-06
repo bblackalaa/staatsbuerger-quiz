@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wien Landesgeschichte Quiz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 16px; background: #f5f5f5; }
+    .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 16px 20px 24px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    h1 { font-size: 22px; margin-top: 0; text-align: center; }
+    #question-text { font-size: 18px; margin: 16px 0; }
+    .option { margin: 6px 0; }
+    button { padding: 10px 18px; font-size: 16px; margin-top: 10px; }
+    #progress { font-size: 14px; color: #555; }
+    #result { margin-top: 16px; font-weight: bold; }
+    #back-link { margin-bottom: 10px; display: inline-block; font-size: 14px; color: #0066cc; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a id="back-link" href="exam.html">&larr; Zurück zur Startseite</a>
+    <h1>Wien Landesgeschichte – Quiz</h1>
+    <div id="progress"></div>
+    <div id="question-text"></div>
+    <div id="options"></div>
+    <button id="next-btn">Weiter</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    // ==== أسئلة فيينا الكاملة تُوضع هنا ====
+    const questions = [
+      {"frage": "Wo entstand das historische Wien?",
+       "correct": ["An einem Kreuzungspunkt alter Verkehrswege südlich der Donau"],
+       "distractors": ["Im Norden Kärntens","Im Salzburger Becken","Auf einer Insel im Neusiedlersee"]},
+      {"frage": "Wie hieß Wien in der römischen Antike?",
+       "correct": ["Vindobona"],
+       "distractors": ["Vindomia","Ventoberg","Romania"]},
+      {"frage": "Woran erinnert die berühmte Einkaufsstraße mit dem Namen ‚Graben' im 1. Wiener Gemeindebezirk?",
+       "correct": ["An den römischen Befestigungsgraben des Militärlagers"],
+       "distractors": ["An ein Schloss","An eine mittelalterliche Markthalle","An eine moderne Einkaufszone"]},
+      {"frage": "Wann wurde das Stadtrecht von Wien erstmals in einer Urkunde schriftlich festgelegt?",
+       "correct": ["Im Jahr 1221 (13. Jahrhundert)"],
+       "distractors": ["Im Jahr 1014","Im Jahr 1453","Im Jahr 1804"]},
+      {"frage": "Über welches Gebiet erstreckte sich die Stadt Wien vor 1850?",
+       "correct": ["Nur auf das Gebiet des jetzigen 1. Bezirkes (Innere Stadt)"],
+       "distractors": ["Auf das gesamte heutige Stadtgebiet","Nur auf die Vorstädte nördlich der Donau","Auf das Gebiet von Graz"]},
+      {"frage": "Wie heißt der erste Bezirk?",
+       "correct": ["Die Innere Stadt"],
+       "distractors": ["Leopoldstadt","Landstraße","Favoriten"]},
+      {"frage": "Welcher Fluss gab der Stadt Wien ihren Namen?",
+       "correct": ["Der Wienfluss (Wien)"],
+       "distractors": ["Die Donau","Die Salzach","Die Mur"]},
+      {"frage": "Welche Teile Wiens gehören zum Weltkulturerbe der UNESCO?",
+       "correct": ["Die Innere Stadt (1. Bezirk) und Schloss Schönbrunn"],
+       "distractors": ["Der Prater allein","Die Donauinsel","Das gesamte Bundesland Niederösterreich"]},
+      {"frage": "Wie heißen die Wohnungen, die von der Stadt Wien gebaut wurden und von Wiener Wohnen vermietet werden?",
+       "correct": ["Gemeindewohnungen"],
+       "distractors": ["Privatwohnungen","Genossenschaftswohnungen","Ferienwohnungen"]},
+      {"frage": "Was war das Besondere an den Gemeindewohnungen, die in der Zwischenkriegszeit errichtet wurden?",
+       "correct": ["Sie waren preiswert und hatten Vorzimmer, fließendes Wasser und WC"],
+       "distractors": ["Sie hatten keine sanitären Anlagen","Sie waren nur für Familien mit Großgrundbesitz","Sie waren Luxusapartment mit Privatgarten"]},
+      {"frage": "Wie viele Wohnungen wurden von 1920 bis 1934 von der Stadt Wien gebaut?",
+       "correct": ["Rund 65.000 neue Wohnungen"],
+       "distractors": ["Rund 5.000","Rund 150.000","Keine"]},
+      {"frage": "Woher kommt der Begriff Gemeindewohnung?",
+       "correct": ["Weil die Gemeinde Wien diese Wohnungen gebaut und finanziert hat"],
+       "distractors": ["Weil sie nur an Gemeindebeamte gingen","Weil sie nur temporär waren","Weil sie Privatleuten gehörten"]},
+      {"frage": "Was ist gemeint, wenn man vom ‚Roten Wien' spricht?",
+       "correct": ["Dass die Sozialdemokratische Arbeiterpartei die Mehrheit im Gemeinderat hatte und soziale Reformen durchführte"],
+       "distractors": ["Dass alle Häuser rot gestrichen waren","Dass Wien unter kommunistischer Herrschaft stand","Dass nur die Farbe Rot als politisches Symbol verboten war"]},
+      {"frage": "In welchem Jahr erfolgte die Befreiung Österreichs?",
+       "correct": ["1945"],
+       "distractors": ["1938","1955","1918"]},
+      {"frage": "1945-1955: Von welcher der vier alliierten Mächte wurde der erste Wiener Bezirk verwaltet?",
+       "correct": ["Der erste Bezirk wurde von allen vier Mächten gemeinsam verwaltet"],
+       "distractors": ["Nur von den Sowjets","Nur von den Amerikanern","Nur von den Briten"]},
+      {"frage": "In welchem Wiener Schloss wurde 1955 der Österreichische Staatsvertrag unterzeichnet?",
+       "correct": ["Im Schloss Belvedere (Sommerpalast des Prinzen Eugen)"],
+       "distractors": ["Im Schloss Schönbrunn","Im Schloss Hof","Im Schloss Mirabel"]},
+      {"frage": "In welchem Bezirk befindet sich das Schloss Belvedere, in dem der Staatsvertrag unterzeichnet wurde?",
+       "correct": ["Im 3. Bezirk (Landstraße)"],
+       "distractors": ["Im 1. Bezirk","Im 2. Bezirk","Im 10. Bezirk"]},
+      {"frage": "Was befindet sich heute im Schloss Belvedere?",
+       "correct": ["Die Österreichische Galerie Belvedere (Museum)"],
+       "distractors": ["Ein Einkaufszentrum","Ein Theater","Ein Universitätsgebäude"]},
+      {"frage": "Wien ist…?",
+       "correct": ["Die Bundeshauptstadt von Österreich, ein Bundesland und eine Gemeinde"],
+       "distractors": ["Nur eine kleine Ortschaft","Nur ein Bundesland, aber keine Stadt","Nur ein Bezirk von Graz"]},
+      {"frage": "Welche Ämter übt der Wiener Bürgermeister bzw. die Wiener Bürgermeisterin aus?",
+       "correct": ["Der Bürgermeister ist gleichzeitig auch Wiener Landeshauptmann"],
+       "distractors": ["Er ist nur Bezirksvorsteher","Er ist nur Stadtrat ohne Landesfunktion","Er ist Präsident Österreichs"]},
+      {"frage": "Wo hat der Wiener Bürgermeister bzw. die Wiener Bürgermeisterin seit 1883 den Amtssitz?",
+       "correct": ["Im Wiener Rathaus"],
+       "distractors": ["Im Schloss Schönbrunn","Im Leopold Museum","Im Parlament"]},
+      {"frage": "Wie heißt der amtierende Wiener Bürgermeister bzw. die Wiener Bürgermeisterin?",
+       "correct": ["Dr. Michael Ludwig"],
+       "distractors": ["Dr. Bruno Kreisky","Sebastian Kurz","Werner Faymann"]},
+      {"frage": "Welches der abgebildeten Wappen ist das Wiener Wappen?",
+       "correct": ["Das rote-weiße Wappen mit weißem Kreuz"],
+       "distractors": ["Ein blaues Wappen mit Löwen","Ein grünes Wappen mit Baum","Ein schwarzes Wappen mit Stern"]},
+      {"frage": "Aus wie vielen Gemeinderäte*innen besteht der Wiener Gemeinderat?",
+       "correct": ["100 Gemeinderät*innen"],
+       "distractors": ["50","150","200"]},
+      {"frage": "Wer darf bei den Sitzungen des Wiener Gemeinderates zusehen und zuhören?",
+       "correct": ["Die meisten Sitzungen sind öffentlich, interessierte Personen dürfen zuhören"],
+       "distractors": ["Nur geladene Gäste dürfen zuhören","Niemand darf zuhören","Nur Journalisten dürfen zuhören"]},
+      {"frage": "Welche politischen Parteien sind derzeit im Wiener Gemeinderat vertreten?",
+       "correct": ["SPÖ, NEOS, ÖVP, GRÜNE, FPÖ"],
+       "distractors": ["Nur SPÖ und ÖVP","Nur Grüne und NEOS","Nur FPÖ"]},
+      {"frage": "Welche politische Funktion üben Wiener Gemeinderat*innen gleichzeitig noch aus?",
+       "correct": ["Sie sind gleichzeitig auch Abgeordnete zum Wiener Landtag"],
+       "distractors": ["Sie sind gleichzeitig Bundesräte","Sie sind Richter","Sie sind Bürgermeister"]},
+      {"frage": "Aus wie vielen Bezirken besteht Wien seit 1954?",
+       "correct": ["23 Bezirke"],
+       "distractors": ["10 Bezirke","50 Bezirke","5 Bezirke"]},
+      {"frage": "Welche Bezirke befinden sich nördlich der Donau?",
+       "correct": ["Floridsdorf (21) und Donaustadt (22)"],
+       "distractors": ["Favoriten und Meidling","Innere Stadt und Landstraße","Währing und Döbling"]},
+      {"frage": "Wo wohnte Erzherzogin Maria Theresia im Sommer?",
+       "correct": ["Im Wiener Schloss Schönbrunn"],
+       "distractors": ["Im Schloss Hof","Im Schloss Belvedere","Im Schloss Mirabell"]},
+      {"frage": "Woher kommt der Name des Schlosses Schönbrunn?",
+       "correct": ["Vom schönen Brunnen, den Kaiser Matthias entdeckt haben soll"],
+       "distractors": ["Vom Namen einer Kaiserin 'Schön'","Weil es immer schön aussieht","Vom Fluss Schönerbach"]},
+      {"frage": "Was befindet sich im Schlosspark von Schönbrunn?",
+       "correct": ["Der älteste Tiergarten der Welt und ein wiederhergestelltes Labyrinth"],
+       "distractors": ["Ein modernes Stadion","Eine Universität","Ein Industriegebiet"]},
+      {"frage": "Was befindet sich zwischen dem Naturhistorischen und dem Kunsthistorischen Museum?",
+       "correct": ["Ein Denkmal Maria Theresias"],
+       "distractors": ["Ein Park namens Donaupark","Ein Einkaufszentrum","Ein Bahnhof"]},
+      {"frage": "Von welcher internationalen Organisation wurde Schönbrunn zum Kulturerbe erklärt?",
+       "correct": ["UNESCO (1996)"],
+       "distractors": ["UNICEF","Weltbank","Europäische Union"]},
+      {"frage": "Wie heißt die größte Glocke des Stephansdoms, die immer zum Jahreswechsel geläutet wird?",
+       "correct": ["Pummerin"],
+       "distractors": ["Maria Glocke","Stephansglocke","Donauglocke"]},
+      {"frage": "Wie wird der Stephansdom von den Wiener*innen noch genannt?",
+       "correct": ["Steffl"],
+       "distractors": ["Stiffel","Stephi","Domini"]},
+      {"frage": "Wo steht der Stephansdom?",
+       "correct": ["Im Zentrum von Wien, am Stephansplatz (1. Bezirk)"],
+       "distractors": ["In Favoriten","In Floridsdorf","Am Prater"]},
+      {"frage": "Was gehört zum Wiener Prater?",
+       "correct": ["Der Prater ist ein großes öffentliches Erholungsgebiet im 2. Bezirk; das Riesenrad ist ein Wahrzeichen"],
+       "distractors": ["Nur ein kleiner Park","Ein Industriepark","Ein Wohnviertel"]},
+      {"frage": "Wie heißt der Teil des Praters, der ein Vergnügungspark ist?",
+       "correct": ["Der Volksprater (Wurstelprater)"],
+       "distractors": ["Der Tierprater","Der Waldprater","Der Seapark"]},
+      {"frage": "Welches Wahrzeichen befindet sich im Wiener Prater?",
+       "correct": ["Das Riesenrad (erbaut 1896/1897)"],
+       "distractors": ["Der Stephansdom","Das Schloss Schönbrunn","Die Hofburg"]},
+      {"frage": "Was war der ursprüngliche Zweck der Donauinsel?",
+       "correct": ["Hochwasserschutz zwischen Neuer Donau und dem bestehenden Flussbett"],
+       "distractors": ["Ein Freizeitpark","Ein Industriegebiet","Ein Wohngebiet"]},
+      {"frage": "Welches Open-Air-Festival wird jährlich auf der Donauinsel gefeiert?",
+       "correct": ["Das Donauinselfest (im Juni)"],
+       "distractors": ["Wiener Festspielnacht","Praterfest","Schönbrunnfest"]},
+      {"frage": "Welche Brunnen erinnern an die Eröffnung der beiden Hochquellenwasserleitungen?",
+       "correct": ["Der Hochstrahlbrunnen am Schwarzenbergplatz und die Brunnen im Rathauspark"],
+       "distractors": ["Die Pummerin und das Riesenrad","Der Stephansplatzbrunnen","Der Donaubrunnen"]},
+      {"frage": "Wie wird Wien mit Trinkwasser versorgt?",
+       "correct": ["Durch die Hochquellenleitungen aus den Bergen (Schneeberg, Rax, Schneealpe)"],
+       "distractors": ["Nur durch die Donau","Durch Meerwasserentsalzung","Nur durch Grundwasser"]},
+      {"frage": "Wie heißt das 1784 gegründete Krankenhaus, das auch Arme behandelte?",
+       "correct": ["Das Allgemeine Krankenhaus (AKH)"],
+       "distractors": ["Das Stadtspital Neunkirchen","Das Wiener Landeskrankenhaus","Das Belvedere Klinikum"]},
+      {"frage": "Was überreicht die Stadt Wien – Kinder- und Jugendhilfe anlässlich der Geburt eines Babys in Wien den Eltern?",
+       "correct": ["Einen praktischen Wickelrucksack mit Gutscheinheft und die Wiener Dokumentenmappe (kostenloses Begrüßungsgeschenk)"],
+       "distractors": ["Ein Geldgeschenk","Nur ein Brief","Nichts"]},
+      {"frage": "Welche war die erste U-Bahn Linie in Wien (Teilöffnung)?",
+       "correct": ["Teil der U1 zwischen Reumannplatz und Karlsplatz (1978)"],
+       "distractors": ["U2 (1989)","U4 (1965)","U6 (1990)"]},
+      {"frage": "Wie viele U-Bahn Linien gibt es aktuell in Wien nach der 3. Ausbauphase?",
+       "correct": ["Fünf Linien (Gesamtlänge rund 84 km)"],
+       "distractors": ["Drei Linien","Zehn Linien","Eine Linie"]},
+      {"frage": "Bis zu welcher Altersgrenze dürfen Kinder in den Schulferien kostenlos die öffentlichen Verkehrsmittel in Wien benutzen?",
+       "correct": ["Kinder bis 15 Jahre, Schüler*innen sogar bis 24 Jahre (in Schulferien)"],
+       "distractors": ["Nur bis 6 Jahre","Bis 10 Jahre","Bis 18 Jahre für alle"]},
+      {"frage": "Welche Rolle spielt Wien für die UNO?",
+       "correct": ["Wien ist einer der UNO-Sitze und Sitz vieler internationaler Organisationen (seit 1979)"],
+       "distractors": ["Wien ist kein UNO-Sitz","Wien ist nur ein regionales Büro","Wien war nie international relevant"]},
+      {"frage": "Auf Initiative welchen österreichischen Bundeskanzlers wurde Wien 1979 UNO-Sitz?",
+       "correct": ["Auf Initiative von Dr. Bruno Kreisky"],
+       "distractors": ["Auf Initiative von Dr. Michael Ludwig","Auf Initiative von Sebastian Kurz","Auf Initiative von Franz Vranitzky"]},
+      {"frage": "In welchem Bezirk befindet sich die UNO-City?",
+       "correct": ["Im 22. Bezirk (Donaustadt)"],
+       "distractors": ["Im 1. Bezirk","Im 3. Bezirk","Im 7. Bezirk"]},
+      {"frage": "Welche internationalen Organisationen haben seit vielen Jahren ihren Sitz in Wien?",
+       "correct": ["UNO, OPEC, OSZE, UNIDO, IAEA"],
+       "distractors": ["NATO und EU nur","Nur lokale NGOs","Nur Universitäten"]},
+      {"frage": "Was bedeutet die Abkürzung OSZE?",
+       "correct": ["Organisation für Sicherheit und Zusammenarbeit in Europa"],
+       "distractors": ["Organisation für Soziale Zusammenarbeit Europas","Österreichische Sicherheitszone","Organsiation für Seerecht"]},
+      {"frage": "Was sind die Ziele der OSZE?",
+       "correct": ["Wahrung von Frieden und Menschenrechten, Wahlkontrollen, Wiederaufbau nach Konflikten und Zusammenarbeit"],
+       "distractors": ["Nur militärische Eingriffe","Nur wirtschaftliche Sanktionen","Nur Sportveranstaltungen"]},
+      // السؤال العشوائي الإضافي
+      {"frage": "Welcher berühmte Komponist lebte und arbeitete in Wien?",
+       "correct": ["Ludwig van Beethoven"],
+       "distractors": ["Wolfgang Amadeus Mozart","Johann Sebastian Bach","Antonio Vivaldi"]}
+    ];
+    // ==== نهاية منطقة الأسئلة ====
+
+    let currentIndex = 0;
+    let score = 0;
+    let currentCorrectIndices = new Set();
+
+    const progressEl = document.getElementById("progress");
+    const questionTextEl = document.getElementById("question-text");
+    const optionsEl = document.getElementById("options");
+    const nextBtn = document.getElementById("next-btn");
+    const resultEl = document.getElementById("result");
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function showQuestion() {
+      if (currentIndex >= questions.length) {
+        finishQuiz();
+        return;
+      }
+
+      const q = questions[currentIndex];
+      progressEl.textContent = `Frage ${currentIndex + 1} von ${questions.length}`;
+      questionTextEl.textContent = q.frage;
+      optionsEl.innerHTML = "";
+      resultEl.textContent = "";
+
+      const options = shuffle([...q.correct, ...q.distractors]);
+      currentCorrectIndices = new Set();
+      options.forEach((opt, idx) => {
+        if (q.correct.includes(opt)) {
+          currentCorrectIndices.add(idx);
+        }
+      });
+
+      options.forEach((opt, idx) => {
+        const label = document.createElement("label");
+        label.className = "option";
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.value = idx;
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(" " + opt));
+        optionsEl.appendChild(label);
+        optionsEl.appendChild(document.createElement("br"));
+      });
+    }
+
+    function nextQuestion() {
+      const checkboxes = optionsEl.querySelectorAll("input[type='checkbox']");
+      const selected = new Set();
+      checkboxes.forEach((cb, idx) => {
+        if (cb.checked) {
+          selected.add(idx);
+        }
+      });
+
+      let isCorrect = selected.size === currentCorrectIndices.size;
+      if (isCorrect) {
+        for (let idx of selected) {
+          if (!currentCorrectIndices.has(idx)) {
+            isCorrect = false;
+            break;
+          }
+        }
+      }
+
+      if (isCorrect && currentCorrectIndices.size > 0) {
+        score += 1;
+      }
+
+      currentIndex += 1;
+      if (currentIndex < questions.length) {
+        showQuestion();
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function finishQuiz() {
+      questionTextEl.textContent = "";
+      optionsEl.innerHTML = "";
+      nextBtn.disabled = true;
+      const percent = (score / questions.length) * 100;
+      const passed = percent >= 50;
+      resultEl.textContent =
+        `Ergebnis: ${score} von ${questions.length} korrekt – ${percent.toFixed(2)}% ` +
+        (passed ? "(BESTANDEN)" : "(NICHT BESTANDEN)");
+    }
+
+    nextBtn.addEventListener("click", nextQuestion);
+    showQuestion();
+  </script>
+</body>
+</html>
