@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>BMI Geschichte – Quiz</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #fff;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    h1 {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 24px;
+    }
+    #start-screen, #quiz-screen {
+      margin-top: 20px;
+    }
+    .question-text {
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+    .option {
+      display: block;
+      margin: 5px 0;
+    }
+    button {
+      font-size: 16px;
+      padding: 8px 16px;
+      margin-top: 15px;
+      cursor: pointer;
+    }
+    #progress {
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+    #result {
+      font-size: 18px;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>BMI Geschichte – Prüfungssimulation</h1>
+
+    <div id="start-screen">
+      <p>Dieses Quiz basiert auf ausgewählten Fragen aus dem BMI-Material zur Staatsbürgerschaftsprüfung.</p>
+      <p>Beantworte mindestens 50% der Fragen richtig, um zu bestehen.</p>
+      <button id="startBtn">Quiz starten</button>
+    </div>
+
+    <div id="quiz-screen" style="display:none;">
+      <div id="progress"></div>
+      <div id="question" class="question-text"></div>
+      <div id="options"></div>
+      <button id="nextBtn">Weiter</button>
+      <div id="result"></div>
+    </div>
+  </div>
+
+  <script>
+    // ========== Fragen: BMI Geschichte ==========
+    const questionsBmiGeschichte = [
+      {
+        id: 1,
+        question: "Zu welchem großen Reich gehörte Österreich ab Christi Geburt fast 500 Jahre lang?",
+        correct: ["Zum Römischen Reich"]
+      },
+      {
+        id: 2,
+        question: "Welche heutigen Staaten gehörten zeitweise zum Kaiserreich Österreich?",
+        correct: ["Slowakei", "Kroatien", "Ungarn"]
+      },
+      {
+        id: 3,
+        question: "Was waren wesentliche Forderungen der Revolution von 1848?",
+        correct: [
+          "Freiheit und Bürgerrechte",
+          "Unabhängigkeit vom Kaiserreich Österreich",
+          "Eine Verfassung"
+        ]
+      },
+      {
+        id: 4,
+        question: "Welche Religionen waren 1918 in Österreich-Ungarn offiziell anerkannt?",
+        correct: ["Islam", "Judentum"]
+      },
+      {
+        id: 5,
+        question: "Welche Folgen hatte der Erste Weltkrieg für Österreich?",
+        correct: [
+          "Die Herrschaft der Habsburger endete",
+          "Österreich wurde eine Republik"
+        ]
+      },
+      {
+        id: 6,
+        question: "Wo war das größte Konzentrationslager auf heutigem österreichischen Gebiet?",
+        correct: ["Mauthausen"]
+      },
+      {
+        id: 7,
+        question: "Welche Reformen veränderten Österreich in den 1970er Jahren?",
+        correct: [
+          "Gleiche Rechte für Männer und Frauen",
+          "Ausbau von Schulen und Universitäten"
+        ]
+      },
+      {
+        id: 8,
+        question: "Was kennzeichnet einen liberalen Staat?",
+        correct: [
+          "Ein Leben in größtmöglicher Freiheit",
+          "Menschen können Entscheidungen selbst treffen"
+        ]
+      },
+      {
+        id: 9,
+        question: "Was macht den österreichischen Rechtsstaat aus?",
+        correct: [
+          "Der Staat muss sich an die Gesetze halten",
+          "Gesetze dürfen Grund- und Menschenrechte nicht verletzen"
+        ]
+      },
+      {
+        id: 10,
+        question: "Was sind die wichtigsten Grundlagen der Rechtsordnung in Österreich?",
+        correct: [
+          "Die Bundesverfassung",
+          "Das Recht der Europäischen Union"
+        ]
+      },
+      {
+        id: 11,
+        question: "Wann begann für das Gebiet des heutigen Österreich die Römerzeit ungefähr?",
+        correct: ["Um Christi Geburt"]
+      },
+      {
+        id: 12,
+        question: "Welcher Fluss bildete zur Römerzeit die Grenze des Römischen Reiches im Gebiet des heutigen Österreich?",
+        correct: ["Donau"]
+      },
+      {
+        id: 13,
+        question: "Wann wurde der Name „Ostarrichi“ (= Österreich) erstmals urkundlich erwähnt?",
+        correct: ["996"]
+      },
+      {
+        id: 14,
+        question: "Welche Volksgruppen wanderten nach dem Ende der Römerzeit in das Gebiet des heutigen Österreich ein?",
+        correct: ["Slawen, Alemannen, Bajuwaren und Ungarn"]
+      },
+      {
+        id: 15,
+        question: "Was ist ein wichtiger Grund dafür, dass in Österreich heute vorwiegend Deutsch gesprochen wird?",
+        correct: ["Die Zuwanderung der Alemannen und Bajuwaren"]
+      },
+      {
+        id: 16,
+        question: "Seit wann regierten die Habsburger fast 650 Jahre lang in Österreich?",
+        correct: ["Ab 1273"]
+      },
+      {
+        id: 17,
+        question: "Wann wurde das „Kaiserreich Österreich“ gegründet, das einen eigenen österreichischen Staat schuf?",
+        correct: ["1804"]
+      },
+      {
+        id: 18,
+        question: "Wie hieß der Staat, in dem Österreich und Ungarn von 1867 bis 1918 zusammengefasst waren?",
+        correct: ["Österreich-Ungarn"]
+      },
+      {
+        id: 19,
+        question: "Welche heutigen Länder gehörten unter anderem zeitweise zum Kaiserreich Österreich bzw. zu Österreich-Ungarn?",
+        correct: ["Tschechien, Slowakei, Ungarn, Kroatien, Teile von Polen und Italien"]
+      },
+      {
+        id: 20,
+        question: "Was bezeichnet man in Österreich im 19. Jahrhundert als „industrielle Revolution“?",
+        correct: ["Die Umwandlung von Landwirtschaft zu Industrie und den Ausbau von Verkehrsnetzen"]
+      },
+      {
+        id: 21,
+        question: "Welche Entwicklung erlebte Wien im 19. Jahrhundert durch Industrialisierung und Zuwanderung?",
+        correct: ["Wien wurde eine Stadt mit rund 2 Millionen Einwohner/innen"]
+      },
+      {
+        id: 22,
+        question: "Welche neuen sozialen Gruppen entstanden in Österreich durch die industrielle Revolution?",
+        correct: ["Arbeiter/innen, Angestellte und Unternehmer/innen"]
+      },
+      {
+        id: 23,
+        question: "Was war ein wichtiger Grund für die Revolution von 1848 im Kaiserreich Österreich?",
+        correct: ["Forderung nach mehr politischen Rechten und Mitbestimmung"]
+      },
+      {
+        id: 24,
+        question: "Welche politischen Veränderungen verlangten die Revolutionärinnen/Revolutionäre von 1848?",
+        correct: ["Eine Verfassung und Wahlen zu einem Parlament"]
+      },
+      {
+        id: 25,
+        question: "Welche Reform blieb unter anderem nach der niedergeschlagenen Revolution von 1848 bestehen?",
+        correct: ["Befreiung der Bauern von ihren Grundherren"]
+      },
+      {
+        id: 26,
+        question: "Welche Veränderung in der Verwaltung und Justiz wurde nach 1848 eingeführt?",
+        correct: ["Trennung von Justiz und Verwaltung und Einführung von Bezirksgerichten"]
+      },
+      {
+        id: 27,
+        question: "Was geschah 1918 mit der Habsburger-Monarchie nach dem Ersten Weltkrieg?",
+        correct: ["Sie zerfiel, und neue Staaten wie die Tschechoslowakei und Jugoslawien entstanden"]
+      },
+      {
+        id: 28,
+        question: "Was passierte im Jahr 1918 auf dem Gebiet des heutigen Österreich politisch?",
+        correct: ["Die Republik Österreich wurde ausgerufen"]
+      },
+      {
+        id: 29,
+        question: "Wann wurde Österreich an das nationalsozialistische Deutschland („Anschluss“) angegliedert?",
+        correct: ["1938"]
+      },
+      {
+        id: 30,
+        question: "Wie war die Volksabstimmung über den „Anschluss“ 1938 gestaltet?",
+        correct: ["Nicht frei und nicht fair, Gegner mussten mit Verfolgung rechnen"]
+      },
+      {
+        id: 31,
+        question: "Welche Gruppen wurden in der Zeit des Nationalsozialismus in Österreich besonders verfolgt?",
+        correct: ["Jüdinnen und Juden, Roma und Sinti, Menschen mit Behinderung, politische Gegner/innen"]
+      },
+      {
+        id: 32,
+        question: "Was geschah mit vielen Menschen aus anderen Ländern während des Zweiten Weltkriegs in Österreich?",
+        correct: ["Viele wurden als Zwangsarbeiter/innen eingesetzt"]
+      },
+      {
+        id: 33,
+        question: "Wie verhielten sich manche Österreicher/innen gegenüber dem NS-Regime?",
+        correct: ["Einige leisteten aktiven Widerstand und kämpften auch in ausländischen Armeen"]
+      },
+      {
+        id: 34,
+        question: "Wo befand sich das größte Konzentrationslager (KZ) auf dem Gebiet des heutigen Österreich?",
+        correct: ["Mauthausen"]
+      },
+      {
+        id: 35,
+        question: "Was geschah 1945 in Bezug auf Österreich und den Nationalsozialismus?",
+        correct: ["Österreich wurde vom Nationalsozialismus befreit, Deutschland kapitulierte"]
+      },
+      {
+        id: 36,
+        question: "Welche Aussage zur Rolle vieler Österreicher/innen im Zweiten Weltkrieg trifft zu?",
+        correct: ["Viele kämpften als Soldaten der deutschen Wehrmacht"]
+      },
+      {
+        id: 37,
+        question: "Welche Aussage zur Verfolgung österreichischer Jüdinnen und Juden ist richtig (grobe Größenordnung)?",
+        correct: ["Viele mussten fliehen, Zehntausende wurden ermordet"]
+      },
+      {
+        id: 38,
+        question: "Was geschah im April 1945 politisch in Österreich?",
+        correct: ["Die Republik Österreich wurde neu ausgerufen"]
+      },
+      {
+        id: 39,
+        question: "Wie war Österreich nach 1945 bis 1955 organisiert?",
+        correct: ["Es war in vier Besatzungszonen der Siegermächte geteilt"]
+      },
+      {
+        id: 40,
+        question: "Was bezeichnet der „Marshallplan“ im Zusammenhang mit Österreich nach 1945?",
+        correct: ["Ein europäisches Wiederaufbauprogramm mit finanzieller Hilfe der USA"]
+      },
+      {
+        id: 41,
+        question: "Was bewirkte der Staatsvertrag von 1955 für Österreich?",
+        correct: ["Österreich erhielt seine volle Unabhängigkeit zurück"]
+      },
+      {
+        id: 42,
+        question: "Was bedeutet die „immerwährende Neutralität“ Österreichs, beschlossen 1955?",
+        correct: ["Österreich tritt keinem Militärbündnis bei und verteidigt seine Neutralität mit einem eigenen Bundesheer"]
+      },
+      {
+        id: 43,
+        question: "Warum ist der 26. Oktober der Nationalfeiertag in Österreich?",
+        correct: ["Es ist der Tag des Beschlusses der immerwährenden Neutralität"]
+      },
+      {
+        id: 44,
+        question: "Was war typisch für die politische Kultur der Zweiten Republik nach 1945?",
+        correct: ["Zusammenarbeit großer Parteien und Sozialpartnerschaft"]
+      },
+      {
+        id: 45,
+        question: "Welche Institutionen sind wichtige „Sozialpartner“ in Österreich?",
+        correct: ["Arbeiterkammer, Wirtschaftskammer, Landwirtschaftskammer, Gewerkschaftsbund"]
+      },
+      {
+        id: 46,
+        question: "Was kennzeichnete die wirtschaftliche Entwicklung Österreichs in den Jahrzehnten nach dem Zweiten Weltkrieg?",
+        correct: ["Hohes Wirtschaftswachstum und Wiederaufbau, Österreich wurde wohlhabender"]
+      },
+      {
+        id: 47,
+        question: "Was gilt heute für Österreich im Hinblick auf Migration?",
+        correct: ["Österreich ist zu einem Einwanderungsland geworden"]
+      },
+      {
+        id: 48,
+        question: "Welcher grobe Anteil der Bevölkerung Österreichs ist im Ausland geboren?",
+        correct: ["Etwa jede fünfte Person"]
+      },
+      {
+        id: 49,
+        question: "Aus welchen Regionen stammen viele Zuwanderinnen/Zuwanderer nach Österreich?",
+        correct: ["Unter anderem aus Bosnien, Serbien, Kosovo, Kroatien, Türkei, Polen, Deutschland"]
+      },
+      {
+        id: 50,
+        question: "Wie beschreiben viele Eingebürgerte ihre Identität in Österreich?",
+        correct: ["Ich bin Österreicher/in, habe aber z.B. serbische oder türkische Wurzeln"]
+      },
+      {
+        id: 51,
+        question: "Was tat Österreich ab den 1980er/2000er Jahren im Umgang mit der NS-Vergangenheit?",
+        correct: ["Anerkennung von Schuld und Rückgabe/Entschädigung von geraubtem Eigentum"]
+      },
+      {
+        id: 52,
+        question: "Was geschah mit vielen Kunstwerken, die in der NS-Zeit geraubt wurden?",
+        correct: ["Sie wurden, wenn möglich, an die rechtmäßigen Eigentümer/innen oder Erben zurückgegeben oder entschädigt"]
+      },
+      {
+        id: 53,
+        question: "Welche bildungspolitische Reform erleichterte ab den 1970er Jahren den Zugang zu höherer Bildung?",
+        correct: ["Kostenlose Schulbücher und Schülerfreifahrt"]
+      },
+      {
+        id: 54,
+        question: "Welche Entwicklung gehört zu den gesellschaftlichen Reformen in Österreich?",
+        correct: ["Gleiche Rechte und Pflichten für Männer und Frauen, eingetragene Partnerschaft für gleichgeschlechtliche Paare"]
+      },
+            {
+        id: 55,
+        question: "Was kennzeichnet Österreich heute in Bezug auf Wohlstand und Vielfalt?",
+        correct: ["Eines der reichsten Länder der Welt mit einer vielfältigen Bevölkerung"]
+      }
+    ];
+   
+
+    let showSolutionMode = false;
+
+    // ===== Distractors automatisch erzeugen =====
+    function addDistractors(questionArray) {
+      const allCorrect = [];
+      questionArray.forEach(q => {
+        q.correct.forEach(ans => {
+          if (!allCorrect.includes(ans)) {
+            allCorrect.push(ans);
+          }
+        });
+      });
+
+      questionArray.forEach(q => {
+        const own = new Set(q.correct);
+        const candidates = allCorrect.filter(ans => !own.has(ans));
+        shuffleArray(candidates);
+        const distractors = candidates.slice(0, Math.min(3, candidates.length));
+        q.distractors = distractors;
+      });
+    }
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+
+    // Quiz-Logik
+    let questions = JSON.parse(JSON.stringify(questionsBmiGeschichte));
+    addDistractors(questions);
+    shuffleArray(questions);
+
+    let currentIndex = 0;
+    let score = 0;
+    let currentOptions = [];
+    let currentCorrectIndices = new Set();
+
+    const startScreen = document.getElementById("start-screen");
+    const quizScreen = document.getElementById("quiz-screen");
+    const startBtn = document.getElementById("startBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const progressDiv = document.getElementById("progress");
+    const questionDiv = document.getElementById("question");
+    const optionsDiv = document.getElementById("options");
+    const resultDiv = document.getElementById("result");
+
+    startBtn.addEventListener("click", () => {
+      startScreen.style.display = "none";
+      quizScreen.style.display = "block";
+      showQuestion();
+    });
+
+    nextBtn.addEventListener("click", () => {
+      nextQuestion();
+    });
+
+    function showQuestion() {
+      if (currentIndex >= questions.length) {
+        finishQuiz();
+        return;
+      }
+
+      const q = questions[currentIndex];
+      progressDiv.textContent = `Frage ${currentIndex + 1} von ${questions.length}`;
+      questionDiv.textContent = q.question;
+
+      const opts = [...q.correct, ...(q.distractors || [])];
+      shuffleArray(opts);
+      currentOptions = opts;
+      currentCorrectIndices = new Set(
+        opts.map((opt, i) => (q.correct.includes(opt) ? i : -1)).filter(i => i >= 0)
+      );
+
+      optionsDiv.innerHTML = "";
+      opts.forEach((opt, idx) => {
+        const label = document.createElement("label");
+        label.className = "option";
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.value = idx;
+        label.appendChild(cb);
+        label.appendChild(document.createTextNode(" " + opt));
+        optionsDiv.appendChild(label);
+      });
+
+      resultDiv.textContent = "";
+      resultDiv.style.color = "black";
+      nextBtn.textContent = "Weiter";
+    }
+
+    function nextQuestion() {
+      // إذا كنا في وضع إظهار الحل، ننتقل للسؤال التالي
+      if (showSolutionMode) {
+        showSolutionMode = false;
+        currentIndex += 1;
+        if (currentIndex < questions.length) {
+          showQuestion();
+        } else {
+          finishQuiz();
+        }
+        return;
+      }
+
+      // أول مرة: نتحقق من الإجابة ثم نعرض الحل الصحيح
+      const checkboxes = optionsDiv.querySelectorAll("input[type='checkbox']");
+      const selected = new Set();
+      checkboxes.forEach(cb => {
+        if (cb.checked) {
+          selected.add(parseInt(cb.value, 10));
+        }
+      });
+
+      const isCorrect = setsEqual(selected, currentCorrectIndices);
+      if (isCorrect) {
+        score += 1;
+        resultDiv.textContent = "Richtig!";
+        resultDiv.style.color = "green";
+      } else {
+        resultDiv.textContent = "Falsch.";
+        resultDiv.style.color = "red";
+      }
+
+      const correctTexts = [];
+      currentCorrectIndices.forEach(idx => {
+        correctTexts.push(currentOptions[idx]);
+      });
+      resultDiv.textContent += " Richtige Antwort(en): " + correctTexts.join(" | ");
+
+      showSolutionMode = true;
+      nextBtn.textContent = "Weiter zur nächsten Frage";
+    }
+
+    function setsEqual(a, b) {
+      if (a.size !== b.size) return false;
+      for (const val of a) {
+        if (!b.has(val)) return false;
+      }
+      return true;
+    }
+
+    function finishQuiz() {
+  const percent = (score / questions.length) * 100;
+  const passed = percent >= 50.0;
+  resultDiv.textContent =
+    `Ergebnis: ${score} von ${questions.length} korrekt – ${percent.toFixed(2)}% ` +
+    (passed ? "(BESTANDEN)" : "(NICHT BESTANDEN)");
+  nextBtn.disabled = true;
+}
+
+  </script>
+</body>
+</html>
